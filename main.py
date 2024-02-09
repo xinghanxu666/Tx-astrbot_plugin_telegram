@@ -102,7 +102,7 @@ class Main:
             "name": "Tx-astrbot_plugin_telegram",
             "desc": "接入 Telegram 的插件",
             "help": "帮助信息查看：https://github.com/xinghanxu666/Tx-astrbot_plugin_telegram",
-            "version": "v1.1.8",
+            "version": "v1.1.9",
             "author": "xinghanxu",
             "repo": "https://github.com/xinghanxu666/Tx-astrbot_plugin_telegram"
         }
