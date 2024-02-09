@@ -18,30 +18,41 @@ import asyncio
 import threading
 
 class Main:
-    """
-    初始化函数, 可以选择直接pass
-    """
     def __init__(self) -> None:
         self.loop = asyncio.new_event_loop()
         logging.basicConfig(
             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
             level=logging.ERROR
         )
-        self.NAMESPACE = "astrbot_plugin_telegram"
+        self.NAMESPACE = "tx_astrbot_plugin_telegram"
         put_config(self.NAMESPACE, "是否启用 Telegram 平台", "telegram_enable", False, "是否启用 Telegram 平台")
         put_config(self.NAMESPACE, "telegram_token", "telegram_token", "", "Telegram Bot 的 Token")
-        put_config(self.NAMESPACE, "telegram_api_url", "telegram_api_url", "", "Telegram API 地址")
-        put_config(self.NAMESPACE, "start_message", "start_message", "我是天絮ChatGPT 机器人", "Telegram 的 /start 开始消息")
+        put_config(self.NAMESPACE, "telegram_api_url", "telegram_api_url", "https://api.telegram.org/bot", "Telegram API 地址")
+        put_config(self.NAMESPACE, "start_message", "start_message", "I'm AstrBot, please talk to me!", "Telegram 的 /start 开始消息")
+        put_config(self.NAMESPACE, "allowed_user_id", "allowed_user_id", 6161175974, "允许使用指令的 Telegram 用户ID")
         self.cfg = load_config(self.NAMESPACE)
         self.start_message = self.cfg["start_message"]
         if self.cfg["telegram_enable"] and self.cfg["telegram_token"]:
-            self.thread = threading.Thread(target=self.run_telegram_bot, args=(self.loop,), daemon=True)
-            self.thread.start()
+            self.thread = threading.Thread(target=self.run_telegram_bot, args=(self.loop,)).start()
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id=update.effective_chat.id, text=self.start_message)
 
     async def message_handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        # 验证
+        allowed_user_id = self.cfg.get('allowed_user_id', 6161175974)
+        if update.effective_chat.id != allowed_user_id:
+            return  # 1
+
+        # 检查
+        if update.message.chat.type == "group" or update.message.chat.type == "supergroup":
+            # 获取
+            bot_username = context.bot.username.lower()
+
+            # 6
+            if f"@{bot_username}" not in update.message.text.lower():
+                return  
+
         message = NakuruGuildMessage()
         message.user_id = update.effective_chat.id
         message.message = [Plain(update.message.text),]
@@ -91,8 +102,7 @@ class Main:
             "name": "Tx-astrbot_plugin_telegram",
             "desc": "接入 Telegram 的插件",
             "help": "帮助信息查看：https://github.com/xinghanxu666/Tx-astrbot_plugin_telegram",
-            "version": "v1.1.0",
+            "version": "v1.1.8",
             "author": "xinghanxu",
             "repo": "https://github.com/xinghanxu666/Tx-astrbot_plugin_telegram"
         }
-        
