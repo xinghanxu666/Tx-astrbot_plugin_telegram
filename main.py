@@ -30,11 +30,13 @@ class Main:
         self.NAMESPACE = "astrbot_plugin_telegram"
         put_config(self.NAMESPACE, "是否启用 Telegram 平台", "telegram_enable", False, "是否启用 Telegram 平台")
         put_config(self.NAMESPACE, "telegram_token", "telegram_token", "", "Telegram Bot 的 Token")
-        put_config(self.NAMESPACE, "start_message", "start_message", "I'm AstrBot, please talk to me!", "Telegram 的 /start 开始消息")
+        put_config(self.NAMESPACE, "telegram_api_url", "telegram_api_url", "", "Telegram API 地址")
+        put_config(self.NAMESPACE, "start_message", "start_message", "我是天絮ChatGPT 机器人", "Telegram 的 /start 开始消息")
         self.cfg = load_config(self.NAMESPACE)
         self.start_message = self.cfg["start_message"]
         if self.cfg["telegram_enable"] and self.cfg["telegram_token"]:
-            self.thread = threading.Thread(target=self.run_telegram_bot, args=(self.loop,)).start()
+            self.thread = threading.Thread(target=self.run_telegram_bot, args=(self.loop,), daemon=True)
+            self.thread.start()
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id=update.effective_chat.id, text=self.start_message)
@@ -44,8 +46,8 @@ class Main:
         message.user_id = update.effective_chat.id
         message.message = [Plain(update.message.text),]
         result = await message_handler(
-            message = message,
-            platform = "telegram",
+            message=message,
+            platform="telegram",
             session_id=update.effective_chat.id,
             role="member",
         )
@@ -65,10 +67,11 @@ class Main:
                 await context.bot.send_photo(chat_id=update.effective_chat.id, photo=image_path)
         if plain_text != "":
             await context.bot.send_message(chat_id=update.effective_chat.id, text=plain_text)
-            
+
     def run_telegram_bot(self, loop: asyncio.AbstractEventLoop = None):
         asyncio.set_event_loop(loop)
-        self.application = ApplicationBuilder().token(self.cfg['telegram_token']).build()
+        telegram_api_url = self.cfg.get('telegram_api_url', 'https://api.telegram.org/bot')
+        self.application = ApplicationBuilder().token(self.cfg['telegram_token']).api_url(telegram_api_url).build()
         start_handler = CommandHandler('start', self.start)
         message_handler = MessageHandler(filters.TEXT, self.message_handle)
         self.application.add_handler(start_handler)
@@ -85,10 +88,11 @@ class Main:
     def info(self):
         return {
             "plugin_type": "platform",
-            "name": "astrbot_plugin_telegram",
+            "name": "Tx-astrbot_plugin_telegram",
             "desc": "接入 Telegram 的插件",
-            "help": "帮助信息查看：https://github.com/Soulter/astrbot_plugin_telegram",
-            "version": "v1.0.0",
-            "author": "Soulter",
-            "repo": "https://github.com/Soulter/astrbot_plugin_telegram"
+            "help": "帮助信息查看：https://github.com/xinghanxu666/Tx-astrbot_plugin_telegram",
+            "version": "v1.1.0",
+            "author": "xinghanxu",
+            "repo": "https://github.com/xinghanxu666/Tx-astrbot_plugin_telegram"
         }
+        
