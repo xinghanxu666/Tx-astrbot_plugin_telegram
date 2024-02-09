@@ -1,4 +1,4 @@
-# astrbot_plugin_telegram
+# TX-astrbot_plugin_telegram
 
 一个让 Astrbot 支持 Telegram 平台的插件。
 
