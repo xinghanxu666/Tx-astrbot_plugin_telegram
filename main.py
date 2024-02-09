@@ -88,10 +88,10 @@ class Main:
     def info(self):
         return {
             "plugin_type": "platform",
-            "name": "Tx-astrbot_plugin_telegram",
+            "name": "tx_astrbot_plugin_telegram",
             "desc": "接入 Telegram 的插件",
             "help": "帮助信息查看：https://github.com/xinghanxu666/Tx-astrbot_plugin_telegram",
-            "version": "v1.3.0",
+            "version": "v1.3.1",
             "author": "xinghanxu",
             "repo": "https://github.com/xinghanxu666/Tx-astrbot_plugin_telegram"
         }
