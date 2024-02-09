@@ -13,7 +13,7 @@ except ImportError:
 from model.platform._nakuru_translation_layer import NakuruGuildMessage
 import logging
 from telegram import Update
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters, Mention
 import asyncio
 import threading
 
@@ -27,11 +27,11 @@ class Main:
         self.NAMESPACE = "astrbot_plugin_telegram"
         put_config(self.NAMESPACE, "是否启用 Telegram 平台", "telegram_enable", False, "是否启用 Telegram 平台")
         put_config(self.NAMESPACE, "telegram_token", "telegram_token", "", "Telegram Bot 的 Token")
-        put_config(self.NAMESPACE, "telegram_api_url", "telegram_api_url", "https://api.telegram.org/bot", "Telegram API 地址")
+        put_config(self.NAMESPACE, "telegram_api_url", "telegram_api_url", "https://api.telegram.org/bot", "Telegram Bot API 地址")
         put_config(self.NAMESPACE, "start_message", "start_message", "I'm AstrBot, please talk to me!", "Telegram 的 /start 开始消息")
-        put_config(self.NAMESPACE, "allowed_user_id", "allowed_user_id", 6161175974, "允许使用指令的 Telegram 用户ID")
         self.cfg = load_config(self.NAMESPACE)
         self.start_message = self.cfg["start_message"]
+        self.api_url = self.cfg["telegram_api_url"] + self.cfg["telegram_token"]
         if self.cfg["telegram_enable"] and self.cfg["telegram_token"]:
             self.thread = threading.Thread(target=self.run_telegram_bot, args=(self.loop,)).start()
 
@@ -39,19 +39,9 @@ class Main:
         await context.bot.send_message(chat_id=update.effective_chat.id, text=self.start_message)
 
     async def message_handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        # 验证用户ID
-        allowed_user_id = self.cfg.get('allowed_user_id', 6161175974)
-        if update.effective_chat.id != allowed_user_id:
-            return  # 如果用户ID不匹配，不回复
-
-        # 检查是否为群组消息
-        if update.message.chat.type == "group" or update.message.chat.type == "supergroup":
-            # 获取机器人的用户名
-            bot_username = context.bot.username.lower()
-
-            # 检查消息中是否包含机器人的用户名
-            if f"@{bot_username}" not in update.message.text.lower():
-                return  # 如果不包含机器人的用户名，不回复
+        # Check if the message contains a mention of the bot
+        if not any(user.id == context.bot.id for user in update.message.entities):
+            return
 
         message = NakuruGuildMessage()
         message.user_id = update.effective_chat.id
@@ -81,10 +71,9 @@ class Main:
 
     def run_telegram_bot(self, loop: asyncio.AbstractEventLoop = None):
         asyncio.set_event_loop(loop)
-        telegram_api_url = self.cfg.get('telegram_api_url', 'https://api.telegram.org/bot')
-        self.application = ApplicationBuilder().token(self.cfg['telegram_token']).api_url(telegram_api_url).build()
+        self.application = ApplicationBuilder().token(self.cfg['telegram_token']).api_url(self.api_url).build()
         start_handler = CommandHandler('start', self.start)
-        message_handler = MessageHandler(filters.TEXT, self.message_handle)
+        message_handler = MessageHandler(filters.TEXT & filters.MENTION, self.message_handle)
         self.application.add_handler(start_handler)
         self.application.add_handler(message_handler)
         self.application.run_polling(stop_signals=None)
@@ -102,7 +91,7 @@ class Main:
             "name": "Tx-astrbot_plugin_telegram",
             "desc": "接入 Telegram 的插件",
             "help": "帮助信息查看：https://github.com/xinghanxu666/Tx-astrbot_plugin_telegram",
-            "version": "v1.1.8",
+            "version": "v1.2.6",
             "author": "xinghanxu",
             "repo": "https://github.com/xinghanxu666/Tx-astrbot_plugin_telegram"
         }
