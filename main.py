@@ -24,7 +24,7 @@ class Main:
             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
             level=logging.ERROR
         )
-        self.NAMESPACE = "tx_astrbot_plugin_telegram"
+        self.NAMESPACE = "astrbot_plugin_telegram"
         put_config(self.NAMESPACE, "是否启用 Telegram 平台", "telegram_enable", False, "是否启用 Telegram 平台")
         put_config(self.NAMESPACE, "telegram_token", "telegram_token", "", "Telegram Bot 的 Token")
         put_config(self.NAMESPACE, "telegram_api_url", "telegram_api_url", "https://api.telegram.org/bot", "Telegram API 地址")
@@ -39,19 +39,19 @@ class Main:
         await context.bot.send_message(chat_id=update.effective_chat.id, text=self.start_message)
 
     async def message_handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        # 验证
+        # 验证用户ID
         allowed_user_id = self.cfg.get('allowed_user_id', 6161175974)
         if update.effective_chat.id != allowed_user_id:
-            return  # 1
+            return  # 如果用户ID不匹配，不回复
 
-        # 检查
+        # 检查是否为群组消息
         if update.message.chat.type == "group" or update.message.chat.type == "supergroup":
-            # 获取
+            # 获取机器人的用户名
             bot_username = context.bot.username.lower()
 
-            # 6
+            # 检查消息中是否包含机器人的用户名
             if f"@{bot_username}" not in update.message.text.lower():
-                return  
+                return  # 如果不包含机器人的用户名，不回复
 
         message = NakuruGuildMessage()
         message.user_id = update.effective_chat.id
@@ -102,7 +102,7 @@ class Main:
             "name": "Tx-astrbot_plugin_telegram",
             "desc": "接入 Telegram 的插件",
             "help": "帮助信息查看：https://github.com/xinghanxu666/Tx-astrbot_plugin_telegram",
-            "version": "v1.1.9",
+            "version": "v1.1.8",
             "author": "xinghanxu",
             "repo": "https://github.com/xinghanxu666/Tx-astrbot_plugin_telegram"
         }
