@@ -1,8 +1,10 @@
 # TX-astrbot_plugin_telegram
 
+支持自定义API地址！
+
 一个让 Astrbot 支持 Telegram 平台的插件。
 
-> 欢迎任何贡献 ❤️
+> 欢迎任何贡献 
 
 ## 使用
 
