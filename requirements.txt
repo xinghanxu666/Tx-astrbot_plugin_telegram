@@ -1,6 +1,6 @@
 # requirements.txt
 
 asyncio==3.4.3
-nakuru
+git+https://github.com/nakuru-dev/nakuru.git
 botpy==1.2.3
 python-telegram-bot==13.7
