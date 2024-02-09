@@ -27,7 +27,7 @@ class Main:
             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
             level=logging.ERROR
         )
-        self.NAMESPACE = "tx_astrbot_plugin_telegram"  # 修改为你想要的NAMESPACE
+        self.NAMESPACE = "tx_astrbot_plugin_telegram"  
         put_config(self.NAMESPACE, "是否启用 Telegram 平台", "telegram_enable", False, "是否启用 Telegram 平台")
         put_config(self.NAMESPACE, "telegram_token", "telegram_token", "", "Telegram Bot 的 Token")
         put_config(self.NAMESPACE, "telegram_api_url", "telegram_api_url", "https://api.telegram.org/bot", "Telegram API地址-awa")
@@ -91,7 +91,7 @@ class Main:
             "name": "tx_astrbot_plugin_telegram",
             "desc": "接入 Telegram 的插件",
             "help": "帮助信息查看：https://github.com/xinghanxu666/Tx-astrbot_plugin_telegram",
-            "version": "v1.3.1",
+            "version": "v1.3.2",
             "author": "xinghanxu",
             "repo": "https://github.com/xinghanxu666/Tx-astrbot_plugin_telegram"
         }
